@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="pragma" content="no-cache"/>
+    <meta http-equiv="content-type" content="no-cache, must-revalidate"/>
+    <meta http-equiv="expires" content="Wed, 26 Feb 1997 08:21:57 GMT"/>
+    <title>首页</title>
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/swiper-5.4.5/swiper.min.css" rel="stylesheet">
+    <link href="css/my.css" rel="stylesheet">
+    <link href="css/nav.css" rel="stylesheet">
+
+    <style>
+        .notice-box li {
+            float: left;
+        }
+        .notice-box li img {
+            width: 100%
+        }
+    </style>
+</head>
+<body>
+<div id="wrapper">
+
+    <div class="nx-header">
+        <div style="display: flex;width: 100%; height: 30px; line-height: 30px; background-color: #eee;">
+            <div style="flex: 5; padding: 0 10px; color: orangered">
+                欢迎访问 科技强国论坛系统
+            </div>
+            <div v-if="user.name" style="flex: 1">
+                欢迎您：{{user.name}}
+                <a style="margin-left: 30px; color: blue" href="javascript:void(0)" @click="logout">退出</a>
+                <a v-if="isCollect" style="margin-left: 10px" href="collectInfo.html">收藏夹</a>
+            </div>
+        </div>
+    </div>
+    <div class="nav-container">
+        <div class="logo">
+            <img src="/front/img/logo.png" alt="">
+            科技强国论坛系统
+        </div>
+        <ul class="nav-item-box">
+            <li><a class="nav-item active" href="index.html">首页</a></li>
+            <li><a class="nav-item" href="advertiserInfo.html" >公告信息</a></li>
+			<li><a class="nav-item" href="countrysideInfo.html">乡村振兴信息</a></li>
+			<li><a class="nav-item" href="shitishuInfo.html">科技书籍信息</a></li>
+			<li><a class="nav-item" href="wendaInfo.html">问答信息</a></li>
+
+            <li v-if="isShow"><a class="nav-item" href="/end/page/index.html" target="_blank">进入后台系统</a></li>
+            <li><a class="nav-item" href="/end/page/login.html" target="_blank">登录</a></li>
+            <li><a class="nav-item" href="/end/page/register.html" target="_blank">注册</a></li>
+        </ul>
+    </div>
+    <!-- /.  导航栏-->
+
+    <div class="swiper-container">
+        <div class="swiper-wrapper">
+            <div class="swiper-slide"><img class="carousel-img" src="/front/img/carousel/3.jpg" alt=""></div>
+            <div class="swiper-slide"><img class="carousel-img" src="/front/img/carousel/4.jpg" alt=""></div>
+        </div>
+        <!-- 如果需要分页器 -->
+        <div class="swiper-pagination"></div>
+
+        <!-- 如果需要导航按钮 -->
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+    </div>
+    <!-- /. 轮播图-->
+
+    <div style="color: cornflowerblue; font-size: 25px; font-weight: bold; margin: 30px">
+        ◆◇公告栏推荐◇◆
+    </div>
+
+    <div class="container">
+        <ul class="row notice-box" style="text-align: center">
+        </ul>
+    </div>
+
+</div>
+
+<!--js库文件-->
+<script src="js/jquery-1.10.2.js"></script>
+<script src="js/swiper-5.4.5/swiper.min.js"></script>
+<script src="js/vue2.6.11/vue.min.js"></script>
+<script src="js/vue2.6.11/axios.js"></script>
+
+<script>
+    $(function () {
+
+        var mySwiper = new Swiper('.swiper-container', {
+            // direction: 'vertical', // 垂直切换选项
+            autoplay: {
+                delay: 5000,
+                disableOnInteraction: false
+            },//可选选项，自动滑动
+            loop: true, // 循环模式选项
+            speed: 2000,
+
+            // 如果需要分页器
+            pagination: {
+                el: '.swiper-pagination',
+                clickable: true
+            },
+
+            // 如果需要前进后退按钮
+            navigation: {
+                nextEl: '.swiper-button-next',
+                prevEl: '.swiper-button-prev'
+            }
+        });
+
+        // 鼠标移入停止自动滚动
+        var $swiperSide = $('.swiper-slide');
+        $swiperSide.mouseenter(function () {
+            mySwiper.autoplay.stop();
+        });
+        // 鼠标移出开始自动滚动
+        $swiperSide.mouseleave(function () {
+            mySwiper.autoplay.start();
+        });
+    });
+
+    new Vue({
+        el: '#wrapper',
+        data: {
+            user: {},
+            isShow: false,
+            isCollect: false
+        },
+        created: function () {
+            axios.get('/auth').then(res => {
+                if (res.data.code === '0') {
+                    this.user = res.data.data;
+                    this.isShow = true;
+                }
+            });
+
+            $.get('/advertiserInfo/page/all?pageSize=10', function (res) {
+                let $box = $('.notice-box');
+                $box.empty();
+                let n = 4;
+                if (res.code === '0') {
+                    let list = res.data.list;
+                    for (let i = 1; i <= n; i++) {
+                        let data = list[i - 1];
+                        let $item = $('<li class="col-md-3"><a href="advertiserInfo.html?id=' + data.id + '"><img style="margin-bottom: 10px" src="img/msg/' + i + '.png">' + data.name + '</a></li>');
+                        $box.append($item);
+                    }
+                } else {
+                    alert("后台服务异常")
+                }
+            })
+        },
+        methods: {
+            logout() {
+                axios.get("/logout").then(res => {
+                    if(res.data.code === '0') {
+                        location.href = '/front/index.html';
+                    } else {
+                        msg('error', res.data.msg);
+                    }
+                })
+            }
+        }
+    })
+</script>
+</body>
+</html>

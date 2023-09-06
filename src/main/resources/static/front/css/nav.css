@@ -1,0 +1,44 @@
+/* 在顶部导航栏中添加黑色背景颜色 */
+.nav-container {
+    background-color: #e4ebe4;
+    width: 100%;
+    height: 70px;
+}
+
+.logo {
+    width: 16%;
+    height: 70px;
+    line-height: 70px;
+    float: left;
+    color: #d15271;
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 10px;
+}
+.logo img {
+    width: 50px;
+}
+
+.nav-item {
+    float: left;
+    line-height: 70px;
+    margin: 0 20px;
+    font-family: 微软雅黑;
+    font-size: 14px;
+    font-weight: bold;
+    color: #636155;
+}
+
+.nav-item:hover {
+    /*border-bottom: 4px solid #9098a7;*/
+    color: blue;
+    /*transition: all 0.2s;*/
+}
+
+a.active {
+    color: blue;
+}
+
+.active {
+    color: blue;
+}
